@@ -1,6 +1,5 @@
-const CACHE_NAME = "semeia-cache-v1";
+const CACHE_NAME = "semeia-cache-v2";
 const ASSETS = [
-  "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
@@ -22,12 +21,24 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Network-first for Supabase calls, cache-first for app shell.
+// index.html (and any Supabase call) always goes to the network first,
+// so updates show up immediately. Only static assets fall back to cache
+// when there's no connection.
 self.addEventListener("fetch", (event) => {
   const url = event.request.url;
+  const isHTML = event.request.mode === "navigate" || url.endsWith(".html") || url.endsWith("/");
+
   if (url.includes("supabase.co") || url.includes("supabase.in")) {
     return; // let Supabase requests hit the network directly
   }
+
+  if (isHTML) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );

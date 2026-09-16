@@ -1,0 +1,25 @@
+{
+  "name": "Semeia — Use. Plante. Transforme.",
+  "short_name": "Semeia",
+  "description": "Transforme uma embalagem em uma nova vida.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF8F2",
+  "theme_color": "#2A4A3C",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

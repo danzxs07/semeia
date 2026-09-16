@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Semeia — Use. Plante. Transforme.</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2A4A3C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Semeia">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --verde-escuro:#1B5E3B;
+    --verde-broto:#6B8F5A;
+    --verde-broto-dark:#DCE6D5;
+    --bege:#F5EFE6;
+    --marrom:#8B6F57;
+    --fundo:#FBF8F3;
+    --branco:#FFFFFF;
+    --linha:#E7DFD2;
+    --texto-suave:#9C8977;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Montserrat', sans-serif;
+    background:#EDE6D9;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:24px 12px;
+    color:var(--verde-escuro);
+  }
+  h1,h2,h3,.brand{font-family:'Montserrat', sans-serif; font-weight:600;}
+
+  .phone{
+    width:390px;
+    max-width:100%;
+    height:800px;
+    background:var(--fundo);
+    border-radius:36px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 30px 60px -20px rgba(42,74,60,0.35), 0 0 0 10px #1c1c1c, 0 0 0 12px #3a3a3a;
+    display:flex;
+    flex-direction:column;
+  }
+  .statusbar{
+    height:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 24px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--verde-escuro);
+    flex-shrink:0;
+  }
+  .screen{
+    flex:1;
+    overflow-y:auto;
+    padding:8px 20px 90px 20px;
+    position:relative;
+    scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{display:none;}
+  .screen.hidden{display:none;}
+
+  /* Bottom nav */
+  .navbar{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height:74px;
+    background:var(--branco);
+    border-top:1px solid var(--linha);
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding-bottom:10px;
+  }
+  .navitem{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-size:10.5px;
+    color:var(--texto-suave);
+    cursor:pointer;
+    font-weight:500;
+    width:60px;
+  }
+  .navitem svg{width:22px; height:22px; stroke:var(--texto-suave); fill:none; stroke-width:1.8;}
+  .navitem.active{color:var(--verde-escuro);}
+  .navitem.active svg{stroke:var(--verde-escuro);}
+
+  /* Header / brand */
+  .top-brand{
+    display:flex; align-items:center; gap:10px;
+    padding:14px 0 6px 0;
+  }
+  .seed-logo{
+    width:34px; height:34px;
+    flex-shrink:0;
+  }
+  .brand-mark-shell-a{fill:var(--marrom);}
+  .brand-mark-shell-b{fill:#C7AF97;}
+  .brand-mark-leaf-a{fill:var(--verde-escuro);}
+  .brand-mark-leaf-b{fill:var(--verde-broto);}
+  .brand-mark-stem{stroke:var(--verde-escuro);}
+  .top-brand .brand{font-size:19px; color:var(--verde-escuro); letter-spacing:0.2px;}
+
+  .hero-msg{
+    margin:14px 0 20px 0;
+  }
+  .hero-msg h1{font-size:22px; line-height:1.3; color:var(--verde-escuro);}
+  .hero-msg p{font-size:13px; color:var(--texto-suave); margin-top:6px;}
+
+  .grid-4{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:6px;
+  }
+  .action-card{
+    background:var(--branco);
+    border-radius:20px;
+    padding:18px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    cursor:pointer;
+    border:1px solid var(--linha);
+    transition:transform .15s ease;
+  }
+  .action-card:active{transform:scale(0.97);}
+  .action-card .icon-wrap{
+    width:38px; height:38px;
+    border-radius:12px;
+    background:var(--bege);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .action-card .icon-wrap svg{width:20px; height:20px; stroke:var(--verde-escuro); fill:none; stroke-width:1.8;}
+  .action-card h3{font-size:14.5px; color:var(--verde-escuro);}
+  .action-card p{font-size:11.5px; color:var(--texto-suave); line-height:1.4;}
+
+  .section-title{
+    font-size:13px;
+    color:var(--marrom);
+    margin:24px 0 10px 0;
+    font-weight:600;
+  }
+
+  .impact-strip{
+    background:var(--verde-escuro);
+    border-radius:20px;
+    padding:18px;
+    color:var(--fundo);
+    display:flex;
+    justify-content:space-between;
+    margin-top:6px;
+  }
+  .impact-strip .item{text-align:center;}
+  .impact-strip .item .num{font-family:'Montserrat'; font-weight:700; font-size:19px;}
+  .impact-strip .item .lbl{font-size:9.5px; opacity:0.75; margin-top:2px;}
+
+  /* Buttons */
+  .btn-primary{
+    background:var(--verde-broto);
+    color:var(--verde-escuro);
+    border:none;
+    border-radius:14px;
+    padding:15px;
+    font-family:'Montserrat';
+    font-weight:700;
+    font-size:15px;
+    width:100%;
+    cursor:pointer;
+    text-align:center;
+  }
+  .btn-primary:active{opacity:0.85;}
+  .btn-secondary{
+    background:transparent;
+    color:var(--verde-escuro);
+    border:1.5px solid var(--verde-escuro);
+    border-radius:14px;
+    padding:13px;
+    font-family:'Montserrat';
+    font-weight:600;
+    font-size:14px;
+    width:100%;
+    cursor:pointer;
+    text-align:center;
+  }
+
+  .back-row{
+    display:flex; align-items:center; gap:10px;
+    padding:14px 0 4px 0;
+    cursor:pointer;
+  }
+  .back-row svg{width:18px; height:18px; stroke:var(--verde-escuro); fill:none; stroke-width:2;}
+  .back-row span{font-size:13px; color:var(--verde-escuro); font-weight:600;}
+
+  /* Scan screen */
+  .scan-frame{
+    margin-top:30px;
+    aspect-ratio:1/1;
+    border-radius:24px;
+    background:linear-gradient(160deg,#2A4A3C,#1c332a);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .scan-frame .corner{
+    position:absolute;
+    width:34px; height:34px;
+    border:3px solid var(--verde-broto);
+  }
+  .scan-frame .tl{top:20px; left:20px; border-right:none; border-bottom:none; border-radius:8px 0 0 0;}
+  .scan-frame .tr{top:20px; right:20px; border-left:none; border-bottom:none; border-radius:0 8px 0 0;}
+  .scan-frame .bl{bottom:20px; left:20px; border-right:none; border-top:none; border-radius:0 0 0 8px;}
+  .scan-frame .br{bottom:20px; right:20px; border-left:none; border-top:none; border-radius:0 0 8px 0;}
+  .scan-line{
+    position:absolute; left:12%; right:12%; height:2px;
+    background:var(--verde-broto);
+    box-shadow:0 0 10px var(--verde-broto);
+    animation:scanmove 2.2s ease-in-out infinite;
+  }
+  @keyframes scanmove{
+    0%,100%{top:18%;}
+    50%{top:78%;}
+  }
+  .scan-hint{text-align:center; font-size:12.5px; color:var(--texto-suave); margin-top:18px;}
+
+  /* Result card */
+  .seed-reveal{
+    text-align:center;
+    padding:20px 0 6px 0;
+  }
+  .seed-reveal .sprout{width:64px; height:64px; margin:0 auto 10px auto;}
+  .seed-reveal h2{font-size:19px; color:var(--verde-escuro);}
+  .info-card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:18px;
+    padding:16px;
+    margin-top:16px;
+  }
+  .info-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--linha);
+    font-size:12.5px;
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-row .k{color:var(--texto-suave);}
+  .info-row .v{color:var(--verde-escuro); font-weight:600; text-align:right;}
+
+  /* Plants */
+  .plant-card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:18px;
+    padding:12px;
+    display:flex;
+    gap:12px;
+    margin-bottom:12px;
+    align-items:center;
+    cursor:pointer;
+  }
+  .plant-thumb{
+    width:56px; height:56px;
+    border-radius:14px;
+    background:var(--bege);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .plant-thumb svg{width:30px; height:30px; stroke:var(--verde-escuro); fill:none; stroke-width:1.6;}
+  .plant-info h3{font-size:14px; color:var(--verde-escuro);}
+  .plant-info p{font-size:11px; color:var(--texto-suave); margin-top:3px;}
+  .stage-pill{
+    display:inline-block;
+    margin-top:5px;
+    font-size:9.5px;
+    background:var(--verde-broto-dark);
+    color:var(--verde-escuro);
+    padding:3px 8px;
+    border-radius:20px;
+    font-weight:600;
+  }
+
+  .diary-track{
+    display:flex;
+    justify-content:space-between;
+    margin-top:22px;
+    position:relative;
+  }
+  .diary-track::before{
+    content:'';
+    position:absolute;
+    top:16px; left:20px; right:20px;
+    height:2px;
+    background:var(--linha);
+    z-index:0;
+  }
+  .diary-step{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    z-index:1;
+    font-size:10px;
+    color:var(--texto-suave);
+  }
+  .diary-dot{
+    width:34px; height:34px;
+    border-radius:50%;
+    background:var(--branco);
+    border:2px solid var(--linha);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .diary-dot.done{background:var(--verde-broto); border-color:var(--verde-broto);}
+  .diary-dot.done svg{stroke:var(--verde-escuro);}
+  .diary-dot svg{width:16px; height:16px; stroke:var(--texto-suave); fill:none; stroke-width:2;}
+
+  .add-photo-btn{
+    margin-top:22px;
+    border:1.5px dashed var(--linha);
+    border-radius:16px;
+    padding:18px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--texto-suave);
+    cursor:pointer;
+  }
+
+  /* Impact */
+  .big-impact-card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:20px;
+    padding:20px;
+    margin-top:14px;
+  }
+  .impact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:16px;
+  }
+  .impact-tile{
+    background:var(--bege);
+    border-radius:16px;
+    padding:14px;
+  }
+  .impact-tile .num{font-family:'Montserrat'; font-weight:700; font-size:22px; color:var(--verde-escuro);}
+  .impact-tile .lbl{font-size:11px; color:var(--marrom); margin-top:4px;}
+
+  .map-box{
+    margin-top:16px;
+    height:150px;
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(127,176,105,0.5) 0, transparent 40%),
+      radial-gradient(circle at 70% 60%, rgba(127,176,105,0.5) 0, transparent 40%),
+      radial-gradient(circle at 45% 80%, rgba(127,176,105,0.4) 0, transparent 35%),
+      radial-gradient(circle at 80% 20%, rgba(127,176,105,0.4) 0, transparent 35%),
+      var(--verde-escuro);
+    position:relative;
+    display:flex; align-items:flex-end; justify-content:flex-start;
+    padding:10px;
+  }
+  .map-box span{
+    background:rgba(0,0,0,0.35);
+    color:#fff;
+    font-size:10px;
+    padding:4px 8px;
+    border-radius:8px;
+  }
+
+  /* Points / challenges */
+  .points-banner{
+    background:linear-gradient(120deg, var(--verde-escuro), #3d6650);
+    border-radius:20px;
+    padding:18px;
+    color:var(--fundo);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+  }
+  .points-banner .num{font-family:'Montserrat'; font-weight:700; font-size:26px;}
+  .points-banner .lbl{font-size:11px; opacity:0.8;}
+
+  .challenge-card{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:16px;
+    padding:14px;
+    margin-bottom:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .challenge-card h4{font-size:13px; color:var(--verde-escuro);}
+  .challenge-card p{font-size:11px; color:var(--texto-suave); margin-top:3px;}
+  .challenge-pts{
+    font-family:'Montserrat'; font-weight:700; font-size:12.5px;
+    color:var(--verde-broto-dark, var(--verde-escuro));
+    background:var(--bege);
+    padding:5px 9px;
+    border-radius:10px;
+    flex-shrink:0;
+  }
+
+  /* Store */
+  .store-cat{
+    margin-top:22px;
+  }
+  .store-cat h3{font-size:15px; color:var(--verde-escuro); margin-bottom:10px;}
+  .store-row{
+    display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none;
+  }
+  .store-row::-webkit-scrollbar{display:none;}
+  .prod-card{
+    min-width:120px;
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:16px;
+    padding:12px;
+    flex-shrink:0;
+  }
+  .prod-thumb{
+    width:100%; height:70px;
+    border-radius:10px;
+    background:var(--bege);
+    margin-bottom:8px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .prod-thumb svg{width:28px; height:28px; stroke:var(--verde-escuro); fill:none; stroke-width:1.6;}
+  .prod-card h4{font-size:11.5px; color:var(--verde-escuro); line-height:1.3;}
+  .prod-card .price{font-size:11px; color:var(--marrom); margin-top:5px; font-weight:600;}
+
+  /* Profile */
+  .profile-head{
+    display:flex; flex-direction:column; align-items:center;
+    padding:24px 0 10px 0;
+  }
+  .avatar{
+    width:74px; height:74px;
+    border-radius:50%;
+    background:var(--bege);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:12px;
+  }
+  .avatar svg{width:34px; height:34px; stroke:var(--verde-escuro); fill:none; stroke-width:1.6;}
+  .profile-head h2{font-size:18px; color:var(--verde-escuro);}
+  .profile-head p{font-size:11.5px; color:var(--texto-suave); margin-top:2px;}
+
+  .stat-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px;
+  }
+  .stat-box{
+    background:var(--branco);
+    border:1px solid var(--linha);
+    border-radius:16px;
+    padding:14px;
+    text-align:center;
+  }
+  .stat-box .num{font-family:'Montserrat'; font-weight:700; font-size:19px; color:var(--verde-escuro);}
+  .stat-box .lbl{font-size:10.5px; color:var(--texto-suave); margin-top:3px;}
+
+  .list-link{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 2px;
+    border-bottom:1px solid var(--linha);
+    font-size:13px;
+    color:var(--verde-escuro);
+    cursor:pointer;
+  }
+  .list-link svg{width:16px; height:16px; stroke:var(--texto-suave); fill:none; stroke-width:2;}
+
+  /* About */
+  .about-hero{
+    margin-top:20px;
+    text-align:center;
+  }
+  .about-hero .sprout{width:56px; height:56px; margin:0 auto 12px auto;}
+  .about-hero h1{font-size:20px; color:var(--verde-escuro); line-height:1.35;}
+  .about-block{
+    margin-top:22px;
+  }
+  .about-block h4{font-size:12px; color:var(--marrom); margin-bottom:6px; font-weight:700;}
+  .about-block p{font-size:13px; line-height:1.6; color:var(--verde-escuro); opacity:0.85;}
+
+  /* Fair impact screen */
+  .fair-screen{
+    background:var(--verde-escuro);
+    margin:-8px -20px 0 -20px;
+    padding:40px 24px 90px 24px;
+    min-height:100%;
+    color:var(--fundo);
+  }
+  .fair-screen .top-brand .brand{color:var(--fundo);}
+  .fair-screen .brand-mark-shell-a{fill:#C7AF97;}
+  .fair-screen .brand-mark-shell-b{fill:#E7DFD2;}
+  .fair-screen .brand-mark-leaf-a{fill:var(--fundo);}
+  .fair-screen .brand-mark-leaf-b{fill:var(--verde-broto);}
+  .fair-screen .brand-mark-stem{stroke:var(--fundo);}
+  .fair-title{
+    font-size:24px;
+    margin-top:30px;
+    text-align:center;
+  }
+  .fair-sub{
+    text-align:center;
+    font-size:12px;
+    opacity:0.7;
+    margin-top:6px;
+  }
+  .fair-numbers{
+    margin-top:34px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .fair-num-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:1px solid rgba(250,248,242,0.15);
+    padding-bottom:16px;
+  }
+  .fair-num-row .num{font-family:'Montserrat'; font-weight:700; font-size:30px;}
+  .fair-num-row .lbl{font-size:11.5px; opacity:0.7; text-align:right; max-width:140px;}
+  .fair-cta{
+    margin-top:40px;
+    text-align:center;
+    font-family:'Montserrat';
+    font-weight:600;
+    font-size:15px;
+    line-height:1.5;
+  }
+  .fair-note{
+    text-align:center;
+    font-size:9.5px;
+    opacity:0.45;
+    margin-top:10px;
+  }
+
+  .hint-tag{
+    position:fixed;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--verde-escuro);
+    color:var(--fundo);
+    font-size:11px;
+    padding:6px 14px;
+    border-radius:20px;
+    opacity:0.85;
+    font-family:'Inter';
+  }
+
+  /* Auth screen */
+  #screen-auth{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:0 26px 40px 26px;
+  }
+  .auth-logo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    margin-bottom:36px;
+  }
+  .auth-logo svg{width:48px; height:48px;}
+  .auth-logo .brand{font-size:22px; color:var(--verde-escuro);}
+  .auth-tabs{
+    display:flex;
+    background:var(--bege);
+    border-radius:14px;
+    padding:4px;
+    margin-bottom:22px;
+  }
+  .auth-tab{
+    flex:1;
+    text-align:center;
+    padding:10px;
+    border-radius:11px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--marrom);
+    cursor:pointer;
+  }
+  .auth-tab.active{background:var(--branco); color:var(--verde-escuro);}
+  .auth-field{margin-bottom:14px;}
+  .auth-field label{font-size:11.5px; color:var(--texto-suave); display:block; margin-bottom:6px; font-weight:500;}
+  .auth-field input{
+    width:100%;
+    padding:13px 14px;
+    border-radius:12px;
+    border:1.5px solid var(--linha);
+    font-size:14px;
+    font-family:'Inter';
+    background:var(--branco);
+    color:var(--verde-escuro);
+  }
+  .auth-field input:focus{outline:none; border-color:var(--verde-broto);}
+  .auth-msg{
+    font-size:12px;
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:14px;
+    display:none;
+  }
+  .auth-msg.error{display:block; background:#F7E3DC; color:#8A3B2A;}
+  .auth-msg.success{display:block; background:var(--verde-broto-dark); color:var(--verde-escuro);}
+  .auth-loading .btn-primary{opacity:0.6; pointer-events:none;}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>Semeia</span>
+  </div>
+
+  <!-- ================= AUTH (login / cadastro) ================= -->
+  <div class="screen" id="screen-auth">
+    <div class="auth-logo">
+      <svg class="seed-logo" viewBox="0 0 64 64" fill="none">
+        <path class="brand-mark-shell-a" d="M32 42C20 42 11 36 8 27C19 24 30 28 32 42Z"/>
+        <path class="brand-mark-shell-b" d="M32 42C44 42 53 36 56 27C45 24 34 28 32 42Z"/>
+        <path class="brand-mark-leaf-a" d="M32 24C21 24 14 15 14 6C25 6 32 13 32 24Z"/>
+        <path class="brand-mark-leaf-b" d="M32 28C45 28 52 17 52 8C39 8 32 17 32 28Z"/>
+        <path class="brand-mark-stem" d="M32 42V16" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">Semeia</span>
+      <span style="font-size:11px; color:var(--texto-suave); letter-spacing:0.3px; margin-top:-6px;">Use. Plante. Transforme.</span>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="setAuthTab('login')">Entrar</div>
+      <div class="auth-tab" id="tab-signup" onclick="setAuthTab('signup')">Criar conta</div>
+    </div>
+
+    <div class="auth-msg" id="auth-msg"></div>
+
+    <div id="auth-name-field" class="auth-field" style="display:none;">
+      <label>Nome</label>
+      <input type="text" id="auth-name" placeholder="Como podemos te chamar?">
+    </div>
+    <div class="auth-field">
+      <label>E-mail</label>
+      <input type="email" id="auth-email" placeholder="voce@email.com">
+    </div>
+    <div class="auth-field">
+      <label>Senha</label>
+      <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres">
+    </div>
+
+    <button class="btn-primary" id="auth-submit" onclick="submitAuth()">Entrar</button>
+    <p style="text-align:center; font-size:11px; color:var(--texto-suave); margin-top:16px;">
+      Ao continuar, seus dados ficam vinculados só à sua conta.
+    </p>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <div class="screen hidden" id="screen-home">
+    <div class="top-brand">
+      <svg class="seed-logo" viewBox="0 0 64 64" fill="none">
+        <path class="brand-mark-shell-a" d="M32 42C20 42 11 36 8 27C19 24 30 28 32 42Z"/>
+        <path class="brand-mark-shell-b" d="M32 42C44 42 53 36 56 27C45 24 34 28 32 42Z"/>
+        <path class="brand-mark-leaf-a" d="M32 24C21 24 14 15 14 6C25 6 32 13 32 24Z"/>
+        <path class="brand-mark-leaf-b" d="M32 28C45 28 52 17 52 8C39 8 32 17 32 28Z"/>
+        <path class="brand-mark-stem" d="M32 42V16" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand">Semeia</span>
+    </div>
+
+    <div class="hero-msg">
+      <h1>Transforme uma embalagem em uma nova vida.</h1>
+    </div>
+
+    <div class="grid-4">
+      <div class="action-card" onclick="go('scan')">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3"/></svg>
+        </div>
+        <div>
+          <h3>Escanear embalagem</h3>
+          <p>Escaneie o QR Code e descubra o que plantar.</p>
+        </div>
+      </div>
+
+      <div class="action-card" onclick="go('plants')">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M12 21V10"/><path d="M12 14c0-4-3-6-7-6 0 4 3 6 7 6z"/><path d="M12 10c0-4 3-6 7-6 0 4-3 6-7 6z"/></svg>
+        </div>
+        <div>
+          <h3>Minhas plantas</h3>
+          <p>Acompanhe suas plantas e veja seu crescimento.</p>
+        </div>
+      </div>
+
+      <div class="action-card" onclick="go('challenges')">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg>
+        </div>
+        <div>
+          <h3>Desafios</h3>
+          <p>Participe e acumule Semeia Points.</p>
+        </div>
+      </div>
+
+      <div class="action-card" onclick="go('impact')">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <div>
+          <h3>Meu impacto</h3>
+          <p>Veja quanto você já contribuiu.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Resumo rápido</div>
+    <div class="impact-strip">
+      <div class="item"><div class="num" id="home-plantadas">0</div><div class="lbl">plantadas</div></div>
+      <div class="item"><div class="num" id="home-germinadas">0</div><div class="lbl">germinadas</div></div>
+      <div class="item"><div class="num" id="home-points">0</div><div class="lbl">Semeia Points</div></div>
+    </div>
+
+    <div class="section-title" onclick="go('about')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+      <span>Por que existimos?</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B4E3A" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  </div>
+
+  <!-- ================= SCAN ================= -->
+  <div class="screen hidden" id="screen-scan">
+    <div class="back-row" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Início</span>
+    </div>
+    <h2 style="margin-top:14px; font-size:18px;">Escanear embalagem</h2>
+    <div class="scan-frame">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="scan-line"></div>
+    </div>
+    <p class="scan-hint">Aponte a câmera para o QR Code na sua embalagem Semeia.</p>
+    <div style="margin-top:24px;">
+      <button class="btn-primary" onclick="go('scanresult')">Simular leitura</button>
+    </div>
+  </div>
+
+  <!-- ================= SCAN RESULT ================= -->
+  <div class="screen hidden" id="screen-scanresult">
+    <div class="back-row" onclick="go('scan')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Escanear</span>
+    </div>
+    <div class="seed-reveal">
+      <svg class="sprout" viewBox="0 0 64 64" fill="none">
+        <path class="brand-mark-shell-a" d="M32 42C20 42 11 36 8 27C19 24 30 28 32 42Z"/>
+        <path class="brand-mark-shell-b" d="M32 42C44 42 53 36 56 27C45 24 34 28 32 42Z"/>
+        <path class="brand-mark-leaf-a" d="M32 24C21 24 14 15 14 6C25 6 32 13 32 24Z"/>
+        <path class="brand-mark-leaf-b" d="M32 28C45 28 52 17 52 8C39 8 32 17 32 28Z"/>
+        <path class="brand-mark-stem" d="M32 42V16" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <h2>Sua embalagem pode ganhar uma nova vida!</h2>
+    </div>
+    <div class="info-card">
+      <div class="info-row"><span class="k">Planta</span><span class="v">Manjericão</span></div>
+      <div class="info-row"><span class="k">Tipo de semente</span><span class="v">Manjericão roxo</span></div>
+      <div class="info-row"><span class="k">Como plantar</span><span class="v">Terra leve, 1cm de profundidade</span></div>
+      <div class="info-row"><span class="k">Água</span><span class="v">A cada 2 dias</span></div>
+      <div class="info-row"><span class="k">Luz solar</span><span class="v">Meio período</span></div>
+      <div class="info-row"><span class="k">Germinação</span><span class="v">7–10 dias</span></div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="btn-primary" onclick="addPlant('Manjericão')">Começar meu plantio</button>
+    </div>
+  </div>
+
+  <!-- ================= PLANTS ================= -->
+  <div class="screen hidden" id="screen-plants">
+    <div class="top-brand">
+      <span class="brand" style="font-size:18px;">Minhas plantas</span>
+    </div>
+
+    <div id="plants-list"></div>
+
+    <div class="add-photo-btn" onclick="go('scan')">
+      + Cadastrar nova planta
+    </div>
+  </div>
+
+  <!-- ================= PLANT DETAIL ================= -->
+  <div class="screen hidden" id="screen-plantdetail">
+    <div class="back-row" onclick="go('plants')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Minhas plantas</span>
+    </div>
+    <h2 style="margin-top:10px; font-size:19px;">Manjericão</h2>
+    <p style="font-size:12px; color:var(--texto-suave); margin-top:4px;">Plantado em 02 de setembro · dia 13</p>
+
+    <div class="diary-track">
+      <div class="diary-step">
+        <div class="diary-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+        Dia 1
+      </div>
+      <div class="diary-step">
+        <div class="diary-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+        Dia 7
+      </div>
+      <div class="diary-step">
+        <div class="diary-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg></div>
+        Dia 15
+      </div>
+      <div class="diary-step">
+        <div class="diary-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg></div>
+        Dia 30
+      </div>
+    </div>
+
+    <div class="add-photo-btn">
+      📷 Adicionar foto de hoje
+    </div>
+
+    <div class="info-card">
+      <div class="info-row"><span class="k">Etapa atual</span><span class="v">Muda crescendo</span></div>
+      <div class="info-row"><span class="k">Última rega</span><span class="v">Ontem</span></div>
+      <div class="info-row"><span class="k">Próxima rega</span><span class="v">Amanhã</span></div>
+    </div>
+  </div>
+
+  <!-- ================= CHALLENGES ================= -->
+  <div class="screen hidden" id="screen-challenges">
+    <div class="back-row" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Início</span>
+    </div>
+    <h2 style="margin-top:10px; font-size:19px;">Desafios & Semeia Points</h2>
+
+    <div class="points-banner">
+      <div>
+        <div class="num">650</div>
+        <div class="lbl">Semeia Points</div>
+      </div>
+      <button class="btn-secondary" style="width:auto; padding:10px 16px; border-color:var(--fundo); color:var(--fundo);" onclick="go('rewards')">Trocar pontos</button>
+    </div>
+
+    <div class="section-title">Como ganhar pontos</div>
+    <div class="challenge-card">
+      <div><h4>Plantar uma embalagem</h4><p>Cada novo plantio registrado</p></div>
+      <div class="challenge-pts">+50</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Registrar crescimento</h4><p>Adicione uma foto da sua planta</p></div>
+      <div class="challenge-pts">+10</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Convidar um amigo</h4><p>Amigo instala e planta a primeira semente</p></div>
+      <div class="challenge-pts">+80</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Ação sustentável do mês</h4><p>Desafio atual: reduzir embalagens plásticas</p></div>
+      <div class="challenge-pts">+120</div>
+    </div>
+  </div>
+
+  <!-- ================= REWARDS ================= -->
+  <div class="screen hidden" id="screen-rewards">
+    <div class="back-row" onclick="go('challenges')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Desafios</span>
+    </div>
+    <h2 style="margin-top:10px; font-size:19px;">Trocar Semeia Points</h2>
+    <div class="challenge-card">
+      <div><h4>10% de desconto</h4><p>Válido na loja Semeia</p></div>
+      <div class="challenge-pts">200 pts</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Kit de sementes surpresa</h4><p>3 variedades sazonais</p></div>
+      <div class="challenge-pts">350 pts</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Sabonete Semeia Beauty</h4><p>Embalagem plantável</p></div>
+      <div class="challenge-pts">450 pts</div>
+    </div>
+    <div class="challenge-card">
+      <div><h4>Cupom parceiro</h4><p>Loja de produtos naturais parceira</p></div>
+      <div class="challenge-pts">600 pts</div>
+    </div>
+  </div>
+
+  <!-- ================= IMPACT ================= -->
+  <div class="screen hidden" id="screen-impact">
+    <div class="top-brand">
+      <span class="brand" style="font-size:18px;">Meu impacto</span>
+    </div>
+
+    <div class="impact-grid">
+      <div class="impact-tile"><div class="num" id="imp-plantadas">0</div><div class="lbl">embalagens plantadas</div></div>
+      <div class="impact-tile"><div class="num" id="imp-germinadas">0</div><div class="lbl">plantas germinadas</div></div>
+      <div class="impact-tile"><div class="num" id="imp-segunda">0</div><div class="lbl">2ª finalidade</div></div>
+      <div class="impact-tile"><div class="num" id="imp-points">0</div><div class="lbl">Semeia Points</div></div>
+    </div>
+
+    <div class="section-title">Mapa Semeia</div>
+    <div class="map-box">
+      <span>7.320 pessoas plantando 🌍</span>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn-secondary" onclick="go('fair')">Ver impacto geral da Semeia</button>
+    </div>
+  </div>
+
+  <!-- ================= STORE ================= -->
+  <div class="screen hidden" id="screen-store">
+    <div class="top-brand">
+      <span class="brand" style="font-size:18px;">Loja Semeia</span>
+    </div>
+
+    <div class="store-cat">
+      <h3>Semeia Beauty</h3>
+      <div class="store-row">
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="16" rx="3"/></svg></div><h4>Sabonete de lavanda</h4><p class="price">R$ 24,90</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="16" rx="3"/></svg></div><h4>Shampoo sólido</h4><p class="price">R$ 32,00</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="7" y="4" width="10" height="16" rx="3"/></svg></div><h4>Hidratante corporal</h4><p class="price">R$ 38,50</p></div>
+      </div>
+    </div>
+
+    <div class="store-cat">
+      <h3>Semeia Food</h3>
+      <div class="store-row">
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/></svg></div><h4>Copo p/ café biodegradável</h4><p class="price">R$ 12,90</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/></svg></div><h4>Saquinho p/ doces</h4><p class="price">R$ 9,90</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/></svg></div><h4>Embalagem p/ chás</h4><p class="price">R$ 14,00</p></div>
+      </div>
+    </div>
+
+    <div class="store-cat">
+      <h3>Semeia Gifts</h3>
+      <div class="store-row">
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12"/></svg></div><h4>Cartão plantável</h4><p class="price">R$ 8,90</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/></svg></div><h4>Embalagem p/ presente</h4><p class="price">R$ 19,90</p></div>
+        <div class="prod-card"><div class="prod-thumb"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/></svg></div><h4>Kit sustentável</h4><p class="price">R$ 59,00</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PROFILE ================= -->
+  <div class="screen hidden" id="screen-profile">
+    <div class="profile-head">
+      <div class="avatar">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+      </div>
+      <h2 id="profile-name">—</h2>
+      <p id="profile-since">Carregando...</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box"><div class="num" id="profile-plantios">0</div><div class="lbl">Plantios realizados</div></div>
+      <div class="stat-box"><div class="num" id="profile-points">0</div><div class="lbl">Semeia Points</div></div>
+      <div class="stat-box"><div class="num" id="profile-plantas">0</div><div class="lbl">Plantas cadastradas</div></div>
+      <div class="stat-box"><div class="num">—</div><div class="lbl">Impacto ambiental</div></div>
+    </div>
+
+    <div style="margin-top:22px;">
+      <div class="list-link" onclick="go('about')"><span>Por que existimos?</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="list-link"><span>Meus pedidos</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="list-link"><span>Convidar amigos</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="list-link" onclick="signOut()"><span>Sair da conta</span><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+  </div>
+
+  <!-- ================= ABOUT ================= -->
+  <div class="screen hidden" id="screen-about">
+    <div class="back-row" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Voltar</span>
+    </div>
+    <div class="about-hero">
+      <svg class="sprout" viewBox="0 0 64 64" fill="none">
+        <path class="brand-mark-shell-a" d="M32 42C20 42 11 36 8 27C19 24 30 28 32 42Z"/>
+        <path class="brand-mark-shell-b" d="M32 42C44 42 53 36 56 27C45 24 34 28 32 42Z"/>
+        <path class="brand-mark-leaf-a" d="M32 24C21 24 14 15 14 6C25 6 32 13 32 24Z"/>
+        <path class="brand-mark-leaf-b" d="M32 28C45 28 52 17 52 8C39 8 32 17 32 28Z"/>
+        <path class="brand-mark-stem" d="M32 42V16" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <h1>Por que existimos?</h1>
+    </div>
+    <div class="about-block">
+      <p>A Semeia nasceu para transformar a maneira como pensamos sobre embalagens. Todos os dias, milhares delas são descartadas depois que seus produtos acabam — e acreditamos que isso não precisa terminar no lixo.</p>
+    </div>
+    <div class="about-block">
+      <p>Por isso, desenvolvemos embalagens biodegradáveis e plantáveis que podem ganhar uma nova finalidade: dar origem a uma planta.</p>
+    </div>
+    <div class="about-block">
+      <h4>NOSSA MISSÃO</h4>
+      <p>Transformar o consumo cotidiano em uma oportunidade de cuidar do meio ambiente.</p>
+    </div>
+    <div class="about-block">
+      <h4>NOSSA VISÃO</h4>
+      <p>Ser referência em embalagens sustentáveis e mostrar que pequenas mudanças geram grandes impactos.</p>
+    </div>
+    <div class="about-block">
+      <h4>NOSSOS VALORES</h4>
+      <p>Sustentabilidade, inovação, responsabilidade ambiental, acessibilidade e consumo consciente.</p>
+    </div>
+  </div>
+
+  <!-- ================= FAIR IMPACT (special) ================= -->
+  <div class="screen hidden" id="screen-fair">
+    <div class="fair-screen">
+      <div class="back-row" onclick="go('impact')" style="padding-top:0;">
+        <svg viewBox="0 0 24 24" stroke="#FAF8F2"><path d="M15 18l-6-6 6-6"/></svg>
+        <span style="color:#FAF8F2;">Meu impacto</span>
+      </div>
+      <div class="fair-title">Impacto da Semeia</div>
+      <div class="fair-sub">Números da comunidade inteira, em tempo real</div>
+
+      <div class="fair-numbers">
+        <div class="fair-num-row"><span class="num">10.482</span><span class="lbl">embalagens plantadas</span></div>
+        <div class="fair-num-row"><span class="num">7.320</span><span class="lbl">usuários ativos</span></div>
+        <div class="fair-num-row"><span class="num">8.915</span><span class="lbl">plantas germinadas</span></div>
+        <div class="fair-num-row"><span class="num">1.240 kg</span><span class="lbl">de resíduos evitados</span></div>
+      </div>
+
+      <div class="fair-cta">Você também pode fazer parte dessa mudança.</div>
+      <div class="fair-note">*estimativa com base nos plantios registrados</div>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="navitem active" data-tab="home" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+      Início
+    </div>
+    <div class="navitem" data-tab="plants" onclick="go('plants')">
+      <svg viewBox="0 0 24 24"><path d="M12 21V10"/><path d="M12 14c0-4-3-6-7-6 0 4 3 6 7 6z"/><path d="M12 10c0-4 3-6 7-6 0 4-3 6-7 6z"/></svg>
+      Plantas
+    </div>
+    <div class="navitem" data-tab="impact" onclick="go('impact')">
+      <svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      Impacto
+    </div>
+    <div class="navitem" data-tab="store" onclick="go('store')">
+      <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/></svg>
+      Loja
+    </div>
+    <div class="navitem" data-tab="profile" onclick="go('profile')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+      Perfil
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ======================================================
+     CONFIGURAÇÃO DO SUPABASE
+     Troque os dois valores abaixo pelos dados do SEU projeto
+     (Project Settings → API, no painel do Supabase).
+     ====================================================== */
+  const SUPABASE_URL = https://iqnokcgklgunwiywapjx.supabase.co/rest/v1/;
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxbm9rY2drbGd1bndpeXdhcGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTgyMzcsImV4cCI6MjEwNTA3NDIzN30.tsr4ORzw4Ejv-bAqlwMRZ6uzUctvljYLFrF7ipSLAfA';
+
+  const supabaseClient = (SUPABASE_URL.startsWith('http'))
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  const tabScreens = ['home','plants','impact','store','profile'];
+  let currentAuthMode = 'login';
+  let currentUser = null;
+  let currentProfile = null;
+  let currentPlants = [];
+
+  function go(name){
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById('screen-' + name).classList.remove('hidden');
+    document.getElementById('screen-' + name).scrollTop = 0;
+    document.querySelectorAll('.navitem').forEach(n => n.classList.remove('active'));
+    if(tabScreens.includes(name)){
+      document.querySelector('.navitem[data-tab="'+name+'"]').classList.add('active');
+    }
+  }
+
+  /* ---------------- AUTH SCREEN ---------------- */
+  function setAuthTab(mode){
+    currentAuthMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('auth-name-field').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('auth-submit').textContent = mode === 'signup' ? 'Criar conta' : 'Entrar';
+    hideAuthMsg();
+  }
+
+  function showAuthMsg(text, type){
+    const el = document.getElementById('auth-msg');
+    el.textContent = text;
+    el.className = 'auth-msg ' + type;
+  }
+  function hideAuthMsg(){
+    const el = document.getElementById('auth-msg');
+    el.className = 'auth-msg';
+  }
+
+  function friendlyAuthError(message){
+    if(/Invalid login credentials/i.test(message)) return 'E-mail ou senha incorretos.';
+    if(/User already registered/i.test(message)) return 'Já existe uma conta com esse e-mail. Tente entrar.';
+    if(/Password should be at least/i.test(message)) return 'A senha precisa ter pelo menos 6 caracteres.';
+    if(/Unable to validate email address/i.test(message)) return 'Digite um e-mail válido.';
+    return message;
+  }
+
+  async function submitAuth(){
+    if(!supabaseClient){
+      showAuthMsg('O app ainda não está conectado ao Supabase. Configure SUPABASE_URL e SUPABASE_ANON_KEY no código.', 'error');
+      return;
+    }
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const name = document.getElementById('auth-name').value.trim();
+
+    if(!email || !password){
+      showAuthMsg('Preencha e-mail e senha.', 'error');
+      return;
+    }
+    if(currentAuthMode === 'signup' && !name){
+      showAuthMsg('Conta seu nome pra gente te chamar direitinho.', 'error');
+      return;
+    }
+
+    document.body.classList.add('auth-loading');
+    hideAuthMsg();
+
+    try{
+      if(currentAuthMode === 'signup'){
+        const { data, error } = await supabaseClient.auth.signUp({
+          email, password,
+          options: { data: { name } }
+        });
+        if(error) throw error;
+
+        if(data.session){
+          await loadApp();
+        } else {
+          showAuthMsg('Conta criada! Confirme seu e-mail antes de entrar (verifique a caixa de entrada e o spam).', 'success');
+          setAuthTab('login');
+        }
+      } else {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+        await loadApp();
+      }
+    } catch(err){
+      showAuthMsg(friendlyAuthError(err.message || 'Não foi possível continuar. Tente novamente.'), 'error');
+    } finally {
+      document.body.classList.remove('auth-loading');
+    }
+  }
+
+  async function signOut(){
+    if(supabaseClient){
+      await supabaseClient.auth.signOut();
+    }
+    currentUser = null; currentProfile = null; currentPlants = [];
+    document.getElementById('auth-email').value = '';
+    document.getElementById('auth-password').value = '';
+    setAuthTab('login');
+    go('auth');
+  }
+
+  /* ---------------- DATA LOADING ---------------- */
+  async function loadApp(){
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    currentUser = user;
+
+    // Garante que existe um profile (caso o trigger de novo usuário não exista ainda)
+    let { data: profile } = await supabaseClient
+      .from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if(!profile){
+      const { data: created } = await supabaseClient
+        .from('profiles')
+        .insert({ id: user.id, name: user.user_metadata?.name || user.email, points: 0 })
+        .select().single();
+      profile = created;
+    }
+    currentProfile = profile;
+
+    const { data: plants } = await supabaseClient
+      .from('plants').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+    currentPlants = plants || [];
+
+    renderAll();
+    go('home');
+  }
+
+  function daysSince(dateStr){
+    const then = new Date(dateStr);
+    const now = new Date();
+    return Math.max(0, Math.floor((now - then) / (1000*60*60*24)));
+  }
+
+  function stageFor(days){
+    if(days < 2) return 'Semente na terra';
+    if(days < 10) return 'Germinada';
+    if(days < 25) return 'Muda crescendo';
+    return 'Planta desenvolvida';
+  }
+
+  function renderAll(){
+    const points = currentProfile?.points || 0;
+    const totalPlants = currentPlants.length;
+    const germinadas = currentPlants.filter(p => daysSince(p.planted_date || p.created_at) >= 10).length;
+
+    ['home-plantadas','imp-plantadas'].forEach(id => document.getElementById(id).textContent = totalPlants);
+    ['home-germinadas','imp-germinadas'].forEach(id => document.getElementById(id).textContent = germinadas);
+    ['home-points','imp-points','profile-points'].forEach(id => document.getElementById(id).textContent = points);
+    document.getElementById('imp-segunda').textContent = totalPlants;
+
+    document.getElementById('profile-name').textContent = currentProfile?.name || currentUser?.email || 'Você';
+    document.getElementById('profile-plantios').textContent = totalPlants;
+    document.getElementById('profile-plantas').textContent = totalPlants;
+    if(currentProfile?.created_at){
+      const d = new Date(currentProfile.created_at);
+      const mes = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      document.getElementById('profile-since').textContent = 'Membro desde ' + mes;
+    }
+
+    renderPlantsList();
+  }
+
+  function renderPlantsList(){
+    const container = document.getElementById('plants-list');
+    if(currentPlants.length === 0){
+      container.innerHTML = '<p style="font-size:12.5px; color:var(--texto-suave); text-align:center; padding:30px 10px;">Você ainda não cadastrou nenhuma planta. Escaneie uma embalagem pra começar. 🌱</p>';
+      return;
+    }
+    container.innerHTML = currentPlants.map(p => {
+      const dias = daysSince(p.planted_date || p.created_at);
+      const stage = stageFor(dias);
+      const dataFmt = new Date(p.planted_date || p.created_at).toLocaleDateString('pt-BR');
+      return `
+        <div class="plant-card">
+          <div class="plant-thumb">
+            <svg viewBox="0 0 24 24"><path d="M12 21V10"/><path d="M12 14c0-4-3-6-7-6 0 4 3 6 7 6z"/></svg>
+          </div>
+          <div class="plant-info">
+            <h3>${p.name}</h3>
+            <p>Plantado em ${dataFmt} · dia ${dias}</p>
+            <span class="stage-pill">${stage}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  /* ---------------- ACTIONS ---------------- */
+  async function addPlant(name){
+    if(!supabaseClient || !currentUser){
+      go('plants');
+      return;
+    }
+    const { error } = await supabaseClient.from('plants').insert({
+      user_id: currentUser.id,
+      name,
+      planted_date: new Date().toISOString().slice(0,10)
+    });
+    if(!error){
+      const newPoints = (currentProfile?.points || 0) + 50;
+      await supabaseClient.from('profiles').update({ points: newPoints }).eq('id', currentUser.id);
+      currentProfile.points = newPoints;
+      const { data: plants } = await supabaseClient
+        .from('plants').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      currentPlants = plants || [];
+      renderAll();
+    }
+    go('plants');
+  }
+
+  /* ---------------- BOOT ---------------- */
+  window.addEventListener('load', async () => {
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    }
+    if(!supabaseClient) return; // fica na tela de login com aviso de configuração pendente
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if(session){
+      await loadApp();
+    }
+  });
+</script>
+
+</body>
+</html>

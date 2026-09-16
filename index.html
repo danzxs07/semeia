@@ -16,7 +16,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --verde-escuro:#1B5E3B;
@@ -1082,7 +1082,7 @@
      Troque os dois valores abaixo pelos dados do SEU projeto
      (Project Settings → API, no painel do Supabase).
      ====================================================== */
-  const SUPABASE_URL = https://iqnokcgklgunwiywapjx.supabase.co/rest/v1/;
+  const SUPABASE_URL = 'https://iqnokcgklgunwiywapjx.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlxbm9rY2drbGd1bndpeXdhcGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTgyMzcsImV4cCI6MjEwNTA3NDIzN30.tsr4ORzw4Ejv-bAqlwMRZ6uzUctvljYLFrF7ipSLAfA';
 
   const supabaseClient = (SUPABASE_URL.startsWith('http'))
